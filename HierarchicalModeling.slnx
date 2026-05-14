@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="HierarchicalModeling/HierarchicalModeling.vcxproj" Id="c965c07c-6ecc-4801-8453-7c847aca5d4c" />
+</Solution>
