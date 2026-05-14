@@ -8,6 +8,9 @@ constexpr int WINDOW_HEIGHT = 700;
 
 HierarchicalModeling g_model;
 
+
+void Timer(int value);
+
 void Perspective(double fovY, double aspect, double zNear, double zFar)
 {
     constexpr double PI = 3.14159265358979323846;
@@ -73,7 +76,20 @@ int main(int argc, char** argv)
     glutDisplayFunc(Display);
     glutReshapeFunc(Reshape);
 
+    glutTimerFunc(16, Timer, 0);
+
     glutMainLoop();
 
     return 0;
+}
+
+void Timer(int value)
+{
+    constexpr double dt = 1.0 / 60.0;
+
+    g_model.Update(dt);
+
+    glutPostRedisplay();
+
+    glutTimerFunc(16, Timer, 0);
 }

@@ -55,6 +55,60 @@ void HierarchicalModeling::AlignYAxisToVector(double dx, double dy, double dz) c
         static_cast<float>(axisZ / axisLength)
     );
 }
+void HierarchicalModeling::DrawBoxY(
+    double width,
+    double height,
+    double depth,
+    float r,
+    float g,
+    float b
+) const
+{
+    SetColor(r, g, b);
+
+    double x = width / 2.0;
+    double z = depth / 2.0;
+
+    glBegin(GL_QUADS);
+
+    // Front face
+    glVertex3f(static_cast<float>(-x), 0.0f, static_cast<float>(z));
+    glVertex3f(static_cast<float>(x), 0.0f, static_cast<float>(z));
+    glVertex3f(static_cast<float>(x), static_cast<float>(height), static_cast<float>(z));
+    glVertex3f(static_cast<float>(-x), static_cast<float>(height), static_cast<float>(z));
+
+    // Back face
+    glVertex3f(static_cast<float>(x), 0.0f, static_cast<float>(-z));
+    glVertex3f(static_cast<float>(-x), 0.0f, static_cast<float>(-z));
+    glVertex3f(static_cast<float>(-x), static_cast<float>(height), static_cast<float>(-z));
+    glVertex3f(static_cast<float>(x), static_cast<float>(height), static_cast<float>(-z));
+
+    // Left face
+    glVertex3f(static_cast<float>(-x), 0.0f, static_cast<float>(-z));
+    glVertex3f(static_cast<float>(-x), 0.0f, static_cast<float>(z));
+    glVertex3f(static_cast<float>(-x), static_cast<float>(height), static_cast<float>(z));
+    glVertex3f(static_cast<float>(-x), static_cast<float>(height), static_cast<float>(-z));
+
+    // Right face
+    glVertex3f(static_cast<float>(x), 0.0f, static_cast<float>(z));
+    glVertex3f(static_cast<float>(x), 0.0f, static_cast<float>(-z));
+    glVertex3f(static_cast<float>(x), static_cast<float>(height), static_cast<float>(-z));
+    glVertex3f(static_cast<float>(x), static_cast<float>(height), static_cast<float>(z));
+
+    // Bottom face
+    glVertex3f(static_cast<float>(-x), 0.0f, static_cast<float>(-z));
+    glVertex3f(static_cast<float>(x), 0.0f, static_cast<float>(-z));
+    glVertex3f(static_cast<float>(x), 0.0f, static_cast<float>(z));
+    glVertex3f(static_cast<float>(-x), 0.0f, static_cast<float>(z));
+
+    // Top face
+    glVertex3f(static_cast<float>(-x), static_cast<float>(height), static_cast<float>(z));
+    glVertex3f(static_cast<float>(x), static_cast<float>(height), static_cast<float>(z));
+    glVertex3f(static_cast<float>(x), static_cast<float>(height), static_cast<float>(-z));
+    glVertex3f(static_cast<float>(-x), static_cast<float>(height), static_cast<float>(-z));
+
+    glEnd();
+}
 
 void HierarchicalModeling::DrawCylinderY(
     double radius,
@@ -308,66 +362,68 @@ void HierarchicalModeling::DrawFloorGrid() const
 
 void HierarchicalModeling::DrawStandLamp() const
 {
-    // Base
-    double baseRadius = 0.65;
-    double baseHeight = 0.25;
+    // step = int(time / holdTime) % 4
+    const double holdTime = 0.65;    // holdTime초마다 전환
+    int step = static_cast<int>(m_timeValue / holdTime) % 4;
 
-    DrawCylinderY(baseRadius, baseHeight, 0.30f, 0.30f, 0.30f);
+    const double baseYawKeyframes[4] = {-35.0, -10.0, 20.0, 35.0};
+    const double lowerArmKeyframes[4] = {-75.0, -55.0, -35.0, -55.0};
+    const double lampHeadKeyframes[4] = {-115.0, -95.0, -75.0, -95.0};
 
+    double baseYawAngle = baseYawKeyframes[step];
+    double lowerArmAngle = lowerArmKeyframes[step];
+    double lampHeadAngle = lampHeadKeyframes[step];
+
+    // Link lengths
+    const double neckLength = 0.85;
+    const double lowerArmLength = 1.85;
+    const double lampHeadLength = 0.75;
+    
+    // Base size
+    const double baseWidth = 1.2;
+    const double baseDepth = 1.2;
+    const double baseHeight = 0.25;
+
+    glPushMatrix();
+
+    //DrawCylinderY(baseRadius, baseHeight, 0.30f, 0.30f, 0.30f);
+    DrawBoxY(baseWidth,baseHeight, baseDepth,0.30f, 0.30f, 0.30f);
+
+
+    //  Base 윗면 중심==neck link의 시작 관절
+    glTranslatef(0.0f, static_cast<float>(baseHeight), 0.0f);
     // p0 = base_top
-    double p0x = 0.0;
-    double p0y = baseHeight;
-    double p0z = 0.0;
-
-    DrawSphere(p0x, p0y, p0z, 0.10, 0.85f, 0.85f, 0.85f);
-
-    // p1 = neck_end
-    double p1x = 0.0;
-    double p1y = 1.10;
-    double p1z = 0.0;
-
-    // p2 = arm_end
-    double p2x = 1.85;
-    double p2y = 2.25;
-    double p2z = 0.0;
-
+    //DrawSphere(0.0, baseHeight, 0.0, 0.10, 0.85f, 0.85f, 0.85f);
+    DrawSphere(0.0, 0.0, 0.0,0.10,0.85f, 0.85f, 0.85f);
+    
+    glRotatef(static_cast<float>(baseYawAngle),0.0f, 1.0f, 0.0f);
+   
     // Link 1: p0 -> p1
-    DrawCylinderBetween(
-        p0x, p0y, p0z,
-        p1x, p1y, p1z,
-        0.07,
-        0.20f, 0.55f, 0.90f
-    );
+    //DrawCylinderBetween(0.0, baseHeight, 0.0, 0.0, 1.10, 0.0, 0.07, 0.20f, 0.55f, 0.90f);
+    DrawCylinderY(0.07,neckLength,0.20f, 0.55f, 0.90f);
+    glTranslatef(0.0f, static_cast<float>(neckLength), 0.0f);
 
-    DrawSphere(p1x, p1y, p1z, 0.12, 0.85f, 0.85f, 0.85f);
+  
+    DrawSphere(0.0f, 0.0f, 0.0f, 0.12, 0.85f, 0.85f, 0.85f);
+    glRotatef( static_cast<float>(lowerArmAngle), 0.0f, 0.0f, 1.0f);
+   
+    DrawCylinderY( 0.07,lowerArmLength,0.20f, 0.55f, 0.90f);
+    glTranslatef(0.0f, static_cast<float>(lowerArmLength), 0.0f);
 
-    // Link 2: p1 -> p2
-    DrawCylinderBetween(
-        p1x, p1y, p1z,
-        p2x, p2y, p2z,
-        0.07,
-        0.20f, 0.55f, 0.90f
-    );
+    DrawSphere(0.0f, 0.0f, 0.0f, 0.12, 0.85f, 0.85f, 0.85f);
+    glRotatef(static_cast<float>(lampHeadAngle),0.0f, 0.0f, 1.0f);
+    DrawFrustumY(0.18,0.48,lampHeadLength,0.95f, 0.80f, 0.25f);
 
-    DrawSphere(p2x, p2y, p2z, 0.12, 0.85f, 0.85f, 0.85f);
-
-    // p3 = head_end
-    double p3x = 2.30;
-    double p3y = 1.45;
-    double p3z = 0.0;
-
-    // Lamp head: p2 -> p3
-    DrawFrustumBetween(
-        p2x, p2y, p2z,
-        p3x, p3y, p3z,
-        0.18,
-        0.48,
-        0.95f, 0.80f, 0.25f
-    );
+    glPopMatrix();
 }
 
 void HierarchicalModeling::Render() const
 {
     DrawFloorGrid();
     DrawStandLamp();
+}
+
+void HierarchicalModeling::Update(double dt)
+{
+    m_timeValue += dt;
 }
