@@ -21,11 +21,9 @@ void HierarchicalModeling::AlignYAxisToVector(double dx, double dy, double dz) c
     double vy = dy / length;
     double vz = dz / length;
 
-    // local y-axis: e_y = (0, 1, 0)
-    // target direction: v_hat = (vx, vy, vz)
-    //
-    // rotation axis:
-    // axis = e_y x v_hat = (vz, 0, -vx)
+    // 기준축 ==(0, 1, 0)
+    // 회전방향  (vx, vy, vz)
+    // 회전 축 == (0, 1, 0) 외적 (vx, vy, vz) = (vz, 0, -vx)
     double axisX = vz;
     double axisY = 0.0;
     double axisZ = -vx;
@@ -39,30 +37,20 @@ void HierarchicalModeling::AlignYAxisToVector(double dx, double dy, double dz) c
 
     double angle = Rad2Deg(std::acos(dot));
 
-    if (axisLength < 1e-6)
+    if (axisLength < 1e-6)// y축과 거의 평행한 경우
     {
-        if (dot < 0.0)
+        if (dot < 0.0)// 반대 방향이므로 x축 기준 180도 회전.
         {
             glRotatef(180.0f, 1.0f, 0.0f, 0.0f);
         }
         return;
     }
 
-    glRotatef(
-        static_cast<float>(angle),
-        static_cast<float>(axisX / axisLength),
-        static_cast<float>(axisY / axisLength),
-        static_cast<float>(axisZ / axisLength)
-    );
+    // axis를 단위 벡터로 정규화한 뒤 축각회전 적용
+    glRotatef(static_cast<float>(angle),static_cast<float>(axisX / axisLength),static_cast<float>(axisY / axisLength),static_cast<float>(axisZ / axisLength));
 }
-void HierarchicalModeling::DrawBoxY(
-    double width,
-    double height,
-    double depth,
-    float r,
-    float g,
-    float b
-) const
+
+void HierarchicalModeling::DrawBoxY(double width,double height,double depth,float r,float g,float b) const
 {
     SetColor(r, g, b);
 
@@ -110,14 +98,7 @@ void HierarchicalModeling::DrawBoxY(
     glEnd();
 }
 
-void HierarchicalModeling::DrawCylinderY(
-    double radius,
-    double height,
-    float r,
-    float g,
-    float b,
-    int segments
-) const
+void HierarchicalModeling::DrawCylinderY(double radius,double height,float r,float g,float b,int segments) const
 {
     SetColor(r, g, b);
 
@@ -146,12 +127,7 @@ void HierarchicalModeling::DrawCylinderY(
     for (int i = 0; i <= segments; ++i)
     {
         double a = 2.0 * PI * i / segments;
-
-        glVertex3f(
-            static_cast<float>(std::cos(a) * radius),
-            0.0f,
-            static_cast<float>(std::sin(a) * radius)
-        );
+        glVertex3f(static_cast<float>(std::cos(a) * radius),0.0f,static_cast<float>(std::sin(a) * radius));
     }
     glEnd();
 
@@ -161,23 +137,12 @@ void HierarchicalModeling::DrawCylinderY(
     for (int i = 0; i <= segments; ++i)
     {
         double a = 2.0 * PI * i / segments;
-
-        glVertex3f(
-            static_cast<float>(std::cos(a) * radius),
-            static_cast<float>(height),
-            static_cast<float>(std::sin(a) * radius)
-        );
+        glVertex3f(static_cast<float>(std::cos(a) * radius), static_cast<float>(height),static_cast<float>(std::sin(a) * radius));
     }
     glEnd();
 }
 
-void HierarchicalModeling::DrawCylinderBetween(
-    double sx, double sy, double sz,
-    double ex, double ey, double ez,
-    double radius,
-    float r, float g, float b,
-    int segments
-) const
+void HierarchicalModeling::DrawCylinderBetween( double sx, double sy, double sz,double ex, double ey, double ez, double radius, float r, float g, float b, int segments) const
 {
     double dx = ex - sx;
     double dy = ey - sy;
@@ -188,28 +153,13 @@ void HierarchicalModeling::DrawCylinderBetween(
     glPushMatrix();
 
     // T_link = Translate(start) * Rotate(local_y -> link_direction)
-    glTranslatef(
-        static_cast<float>(sx),
-        static_cast<float>(sy),
-        static_cast<float>(sz)
-    );
-
+    glTranslatef(static_cast<float>(sx),static_cast<float>(sy),static_cast<float>(sz));
     AlignYAxisToVector(dx, dy, dz);
-
     DrawCylinderY(radius, length, r, g, b, segments);
-
     glPopMatrix();
 }
 
-void HierarchicalModeling::DrawFrustumY(
-    double radiusBottom,
-    double radiusTop,
-    double height,
-    float r,
-    float g,
-    float b,
-    int segments
-) const
+void HierarchicalModeling::DrawFrustumY(double radiusBottom,double radiusTop,double height,float r,float g,float b,int segments) const
 {
     SetColor(r, g, b);
 
@@ -256,14 +206,7 @@ void HierarchicalModeling::DrawFrustumY(
     glLineWidth(1.0f);
 }
 
-void HierarchicalModeling::DrawFrustumBetween(
-    double sx, double sy, double sz,
-    double ex, double ey, double ez,
-    double radiusStart,
-    double radiusEnd,
-    float r, float g, float b,
-    int segments
-) const
+void HierarchicalModeling::DrawFrustumBetween(double sx, double sy, double sz,double ex, double ey, double ez, double radiusStart,double radiusEnd,float r, float g, float b,int segments) const
 {
     double dx = ex - sx;
     double dy = ey - sy;
@@ -272,29 +215,13 @@ void HierarchicalModeling::DrawFrustumBetween(
     double length = std::sqrt(dx * dx + dy * dy + dz * dz);
 
     glPushMatrix();
-
-    glTranslatef(
-        static_cast<float>(sx),
-        static_cast<float>(sy),
-        static_cast<float>(sz)
-    );
-
+    glTranslatef(static_cast<float>(sx), static_cast<float>(sy), static_cast<float>(sz));
     AlignYAxisToVector(dx, dy, dz);
-
     DrawFrustumY(radiusStart, radiusEnd, length, r, g, b, segments);
-
     glPopMatrix();
 }
 
-void HierarchicalModeling::DrawSphere(
-    double cx, double cy, double cz,
-    double radius,
-    float r,
-    float g,
-    float b,
-    int slices,
-    int stacks
-) const
+void HierarchicalModeling::DrawSphere(double cx, double cy, double cz,double radius,float r,float g,float b,int slices,int stacks) const
 {
     SetColor(r, g, b);
 
