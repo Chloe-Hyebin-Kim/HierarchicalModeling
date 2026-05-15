@@ -17,10 +17,12 @@ FK anim 구현.
 ## 문서 구조
 ```
 HierarchicalModeling/
-├── main.cpp // 프로그램 진입점, OpenGL window/callback 설정
-├── HierarchicalModeling.h // HierarchicalModeling 클래스 선언
-├── HierarchicalModeling.cpp  // HierarchicalModeling 클래스 구현
-└── HierarchicalModeling.slnx // Visual Studio 솔루션 구성 파일
+ㄴ-- HierarchicalModeling/
+|   ㄴ--  main.cpp // 프로그램 진입점, OpenGL window/callback 설정
+|   ㄴ--  HierarchicalModeling.h // HierarchicalModeling 클래스 선언
+|   ㄴ--  HierarchicalModeling.cpp  // HierarchicalModeling 클래스 구현
+ㄴ--  Assignment1_HierarchicalModel_keyframe.gif //영상
+ㄴ--  HierarchicalModeling.slnx // Visual Studio 솔루션 구성 파일
 ```
 
 
@@ -32,23 +34,19 @@ Hierarchical modeling에서 각 관절의 local angle만 저장.<br>
 
 #### 로드리게스 회전행렬 비슷하게 -> 계산된 axis와 angle을 함수에 전달 ####
 
-
-각 관절은 자신의 local transformation만 가지고 있으며, <br>
-실제 화면에 그릴 때는 root node부터 현재 node까지의 변환을 순서대로 누적하여 global position과 orientation을 계산한다.
-
-<img width="1327" height="1011" alt="image" src="https://github.com/user-attachments/assets/00cd0842-73b3-4602-8f37-e5f0b442994a" />
+![전등](Assignment1_HierarchicalModel_keyframe.gif)
 
 
 
 ## 모델 설명
 ```
 Base //바닥에 놓인 원기둥 받침대
- └── Neck Joint
-      └── Neck Link  //Base 위에서 시작되는 세로 원기둥 링크
-           └── Arm Joint
-                └── Arm Link //Neck 끝 관절에서 회전하는 팔 형태의 원기둥 링크
-                     └── Lamp Head Joint
-                          └── Lamp Head //Arm 끝 관절에 연결된 절두원뿔 형태의 조명 갓
+ ㄴ-- Neck Joint
+     ㄴ--  Neck Link  //Base 위에서 시작되는 세로 원기둥 링크
+          ㄴ--  Arm Joint
+               ㄴ-- Arm Link //Neck 끝 관절에서 회전하는 팔 형태의 원기둥 링크
+                    ㄴ-- Lamp Head Joint
+                          ㄴ--  Lamp Head //Arm 끝 관절에 연결된원뿔 형태의 조명 갓
 ```
 
 
@@ -60,12 +58,12 @@ Base //바닥에 놓인 원기둥 받침대
 
 
 
-## 함수 설명
-AlignYAxisToVector : local y축 방향으로 만들어진 primitive를 실제 link 방향으로 정렬.   <br>     
+## 주요 함수 설명
+AlignYAxisToVector : local y축 방향으로 만들어진 primitive를 실제 링크 방향으로 정렬.   <br>     
 DrawCylinderY :항상 자신의 local y축 방향으로 원긷우 생성. <br>
 DrawFloorGrid :3D 공간감을 확인하기 위한 바닥 격자. <br>
-
-
-
+DrawFrustumBetween :y축 방향으로 절두원뿔을 만들고 T_frustum = Trans(p_start) dot R(e_y -> v_hat)수핼
+DrawCylinderBetween : y축 방향으로 원기둥 만들고 Local-to-world transform 수행
+DrawStandLamp() : 루트부터 현재 노드까지의 local transform을 순서대로 곱해서 각 노드의 최종 월드 변환.
 
 
