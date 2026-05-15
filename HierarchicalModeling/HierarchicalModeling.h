@@ -20,6 +20,7 @@ private:
 private:
     static void SetColor(float r, float g, float b);
     static double Rad2Deg(double radians);
+    static double Lerp(double a, double b, double t);
 
     void AlignYAxisToVector(double dx, double dy, double dz) const;
     

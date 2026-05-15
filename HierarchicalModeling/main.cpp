@@ -15,7 +15,7 @@ void Perspective(double fovY, double aspect, double zNear, double zFar)
 {
     constexpr double PI = 3.14159265358979323846;
 
-    double f64_Top = zNear * std::tan((fovY * PI / 180.0) / 2.0);
+    double f64_Top = zNear * tan((fovY * PI / 180.0) / 2.0);
     double f64_Bottom = -f64_Top;
     double f64_Right = f64_Top * aspect;
     double f64_Left = -f64_Right;
@@ -34,14 +34,7 @@ void Reshape(int width, int height)
     glLoadIdentity();
 
     double f64_Aspect = static_cast<double>(width) / static_cast<double>(height);
-
-    Perspective(
-        45.0,
-        f64_Aspect,
-        0.1,
-        100.0
-    );
-
+    Perspective(45.0,f64_Aspect,0.1,100.0);
     glMatrixMode(GL_MODELVIEW);
 }
 
@@ -53,9 +46,9 @@ void Display()
     glLoadIdentity();
 
     // Camera view
-    glTranslatef(0.0f, -1.2f, -7.0f);
-    glRotatef(25.0f, 1.0f, 0.0f, 0.0f);
-    glRotatef(-35.0f, 0.0f, 1.0f, 0.0f);
+    glTranslatef(0.0f, -1.2f, -7.0f); //뒤로 빼고 아래로 이동
+    glRotatef(25.0f, 1.0f, 0.0f, 0.0f); //내려다보는 시점
+    glRotatef(-30.0f, 0.0f, 1.0f, 0.0f); //옆에서
 
     g_model.Render();
 
@@ -68,7 +61,7 @@ int main(int argc, char** argv)
 
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
     glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-    glutCreateWindow("Assignment1_HierarchicalModel - 3D Stand Lamp");
+    glutCreateWindow("3D Stand Lamp");
 
     glClearColor(0.06f, 0.07f, 0.09f, 1.0f);
     glEnable(GL_DEPTH_TEST);
@@ -91,5 +84,5 @@ void Timer(int value)
 
     glutPostRedisplay();
 
-    glutTimerFunc(16, Timer, 0);
+    glutTimerFunc(16, Timer, 0);// 1000/FPS=16
 }
