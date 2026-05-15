@@ -15,17 +15,17 @@ void Perspective(double fovY, double aspect, double zNear, double zFar)
 {
     constexpr double PI = 3.14159265358979323846;
 
-    double top = zNear * std::tan((fovY * PI / 180.0) / 2.0);
-    double bottom = -top;
-    double right = top * aspect;
-    double left = -right;
+    double f64_Top = zNear * std::tan((fovY * PI / 180.0) / 2.0);
+    double f64_Bottom = -f64_Top;
+    double f64_Right = f64_Top * aspect;
+    double f64_Left = -f64_Right;
 
-    glFrustum(left, right, bottom, top, zNear, zFar);
+    glFrustum(f64_Left, f64_Right, f64_Bottom, f64_Top, zNear, zFar);
 }
 
 void Reshape(int width, int height)
 {
-    if (height == 0)
+    if (height == 0)//높이 0이면 안됨.
         height = 1;
 
     glViewport(0, 0, width, height);
@@ -33,11 +33,11 @@ void Reshape(int width, int height)
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 
-    double aspect = static_cast<double>(width) / static_cast<double>(height);
+    double f64_Aspect = static_cast<double>(width) / static_cast<double>(height);
 
     Perspective(
         45.0,
-        aspect,
+        f64_Aspect,
         0.1,
         100.0
     );

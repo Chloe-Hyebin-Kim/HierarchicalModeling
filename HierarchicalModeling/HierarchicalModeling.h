@@ -3,6 +3,8 @@
 #include <algorithm>
 #include <GL/freeglut.h>
 
+using namespace std;
+
 class HierarchicalModeling
 {
 public:
@@ -13,7 +15,7 @@ public:
 
 private:
     static constexpr double PI = 3.14159265358979323846;
-    double m_timeValue = 0.0;
+    double m_f64TimeValue = 0.0;
 
 private:
     static void SetColor(float r, float g, float b);
