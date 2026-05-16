@@ -37,6 +37,9 @@ Hierarchical modeling에서 각 관절의 local angle만 저장.<br>
 ![전등](Assignment1_HierarchicalModel_keyframe.gif)
 
 
+![전등](Assignment1_HierarchicalModel_SmoothKeyframe.gif)
+<br>
+<br>
 
 ## 모델 설명
 ```
