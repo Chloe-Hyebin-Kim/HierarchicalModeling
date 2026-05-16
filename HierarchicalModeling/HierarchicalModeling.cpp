@@ -58,9 +58,9 @@ void HierarchicalModeling::AlignYAxisToVector(double dx, double dy, double dz) c
     glRotatef((float)(angle),(float)(axisX / f64AxisLength),(float)(axisY / f64AxisLength),(float)(axisZ / f64AxisLength));
 }
 
-void HierarchicalModeling::DrawBoxY(double width,double height,double depth,float r,float g,float b) const
+void HierarchicalModeling::DrawBoxY(double width,double height,double depth, F32RGB rgb) const
 {
-    SetColor(r, g, b);
+    SetColor(rgb.r, rgb.g, rgb.b);
 
     double x = width / 2.0;
     double z = depth / 2.0;
@@ -106,9 +106,9 @@ void HierarchicalModeling::DrawBoxY(double width,double height,double depth,floa
     glEnd();
 }
 
-void HierarchicalModeling::DrawCylinderY(double radius,double height,float r,float g,float b,int segments) const
+void HierarchicalModeling::DrawCylinderY(double radius,double height, F32RGB rgb, int segments) const
 {
-    SetColor(r, g, b);
+    SetColor(rgb.r, rgb.g, rgb.b);
 
     // Side surface
     glBegin(GL_QUADS);
@@ -150,7 +150,7 @@ void HierarchicalModeling::DrawCylinderY(double radius,double height,float r,flo
     glEnd();
 }
 
-void HierarchicalModeling::DrawCylinderBetween( double sx, double sy, double sz,double ex, double ey, double ez, double radius, float r, float g, float b, int segments) const
+void HierarchicalModeling::DrawCylinderBetween( double sx, double sy, double sz,double ex, double ey, double ez, double radius, F32RGB rgb, int segments) const
 {
     double dx = ex - sx;
     double dy = ey - sy;
@@ -163,13 +163,13 @@ void HierarchicalModeling::DrawCylinderBetween( double sx, double sy, double sz,
     // T_link = Translate(start) * Rotate(local_y -> link_direction)
     glTranslatef((float)(sx),(float)(sy),(float)(sz));
     AlignYAxisToVector(dx, dy, dz);
-    DrawCylinderY(radius, f64Length, r, g, b, segments);
+    DrawCylinderY(radius, f64Length, rgb, segments);
     glPopMatrix();
 }
 
-void HierarchicalModeling::DrawFrustumY(double radiusBottom,double radiusTop,double height,float r,float g,float b,int segments) const
+void HierarchicalModeling::DrawFrustumY(double radiusBottom,double radiusTop,double height, F32RGB rgb, int segments) const
 {
-    SetColor(r, g, b);
+    SetColor(rgb.r, rgb.g, rgb.b);
 
     glBegin(GL_QUADS);
     for (int i = 0; i < segments; ++i)
@@ -214,7 +214,7 @@ void HierarchicalModeling::DrawFrustumY(double radiusBottom,double radiusTop,dou
     glLineWidth(1.0f);
 }
 
-void HierarchicalModeling::DrawFrustumBetween(double sx, double sy, double sz,double ex, double ey, double ez, double radiusStart,double radiusEnd,float r, float g, float b,int segments) const
+void HierarchicalModeling::DrawFrustumBetween(double sx, double sy, double sz,double ex, double ey, double ez, double radiusStart,double radiusEnd, F32RGB rgb,int segments) const
 {
     double dx = ex - sx;
     double dy = ey - sy;
@@ -225,13 +225,13 @@ void HierarchicalModeling::DrawFrustumBetween(double sx, double sy, double sz,do
     glPushMatrix();
     glTranslatef((float)(sx),(float)(sy),(float)(sz));
     AlignYAxisToVector(dx, dy, dz);
-    DrawFrustumY(radiusStart, radiusEnd, f64Length, r, g, b, segments);
+    DrawFrustumY(radiusStart, radiusEnd, f64Length, rgb, segments);
     glPopMatrix();
 }
 
-void HierarchicalModeling::DrawSphere(double cx, double cy, double cz,double radius,float r,float g,float b,int slices,int stacks) const
+void HierarchicalModeling::DrawSphere(double cx, double cy, double cz,double radius, F32RGB rgb, int slices, int stacks) const
 {
-    SetColor(r, g, b);
+    SetColor(rgb.r, rgb.g, rgb.b);
 
     for (int stack = 0; stack < stacks; ++stack)
     {
@@ -297,29 +297,30 @@ void HierarchicalModeling::DrawFloorGrid() const
 
 void HierarchicalModeling::DrawStandLamp() const
 {
-// Pose 0: base=-35, arm=-75, head=-115
-// Pose 1: base=-10, arm=-55, head=-95
-// Pose 2: base= 20, arm=-35, head=-75
-// Pose 3: base= 35, arm=-55, head=-95
-        // 인덱스 같으면 같은 순간 
-    //const double f64BaseYawDegArr[4] = {-35.0, -10.0, 20.0, 35.0};
-    //const double f64ArmRollDegArr[4] = {-75.0, -55.0, -35.0, -55.0};
-    //const double f64HeadRollDegArr[4] = {-115.0, -95.0, -75.0, -95.0};
-    const double holdTime = 0.8;
+    // PoseIndex 0: base=-35, arm=-75, head=-115 ->  인덱스 같으면 같은 순간의 모션! 
+    // PoseIndex 1: base=-10, arm=-55, head=-95
+    // PoseIndex 2: base= 20, arm=-35, head=-75
+    // PoseIndex 3: base= 35, arm=-55, head=-95
+    // 
+    //const double f64BaseYawDegArr[MOTION_CNT] = {-35.0, -10.0, 20.0, 35.0};
+    //const double f64ArmRollDegArr[MOTION_CNT] = {-75.0, -55.0, -35.0, -55.0};
+    //const double f64HeadRollDegArr[MOTION_CNT] = {-115.0, -95.0, -75.0, -95.0};
+
+    const double holdTime = 0.75;
 
     //움직임 부드럽게 변경
-    const double f64BaseYawDegArr[4] = { -1.0, 2.0, 5.0, 2.0}; // y축
-    const double f64ArmRollDegArr[4] = { -18.0, -25.0, -32.0, -20.0 }; // z축
-    const double f64HeadRollDegArr[4] = { -98.0, -94.0, -90.0, -93.0 }; // z축
+    const double f64BaseYawDegArr[MOTION_CNT] = {-20.0, -35.0, -28.5, -24.0, -15.0}; // y축
+    const double f64ArmRollDegArr[MOTION_CNT] = { -30.0, -45.0, -43.0, -42.0, -35.0 }; // z축
+    const double f64HeadRollDegArr[MOTION_CNT] = { -98.0, -94.0, -90.0, -93.0 , -96.0}; // z축
 
     // 흐름 계산
     double keyframePosition = m_f64TimeValue / holdTime;
 
     // 현재 위치
-    int currentStep = (int)(floor(keyframePosition)) % 4;
+    int currentStep = (int)(floor(keyframePosition)) % MOTION_CNT;
 
     // 다음 위히
-    int nextStep = (currentStep + 1) % 4;
+    int nextStep = (currentStep + 1) % MOTION_CNT;
 
     // 진행률
     double alpha = keyframePosition - floor(keyframePosition);
@@ -330,7 +331,7 @@ void HierarchicalModeling::DrawStandLamp() const
     double f64HeadRollAngle = Lerp(f64HeadRollDegArr[currentStep],f64HeadRollDegArr[nextStep],alpha);
 
     //const double holdTime = 0.65;    // holdTime초마다 전환
-    //int step = (int)(m_f64TimeValue / holdTime) % 4;
+    //int step = (int)(m_f64TimeValue / holdTime) % MOTION_CNT;
     //double f64BaseYawAngle = f64BaseYawDegArr[step];
     //double f64ArmRollAngle = f64ArmRollDegArr[step];
     //double f64HeadRollAngle = f64HeadRollDegArr[step];
@@ -348,32 +349,34 @@ void HierarchicalModeling::DrawStandLamp() const
     glPushMatrix();
 
     //DrawCylinderY(baseRadius, baseHeight, 0.30f, 0.30f, 0.30f);
-    DrawBoxY(f64BaseWidth, f64BaseHeight, f64BaseDepth, 0.30f, 0.30f, 0.30f);
+    DrawBoxY(1.2, 0.25, 1.2, F32RGB(DARK_GRAY));
 
 
     //  Base 윗면 중심==neck link의 시작 관절
     glTranslatef(0.0f,(float)(f64BaseHeight), 0.0f);
     // p0 = base_top
     //DrawSphere(0.0, baseHeight, 0.0, 0.10, 0.85f, 0.85f, 0.85f);
-    DrawSphere(0.0, 0.0, 0.0,0.10,0.85f, 0.85f, 0.85f);
-    
+    DrawSphere(0.0, 0.0, 0.0,0.10, F32RGB(LIGHT_GRAY));
     glRotatef((float)(f64BaseYawAngle),0.0f, 1.0f, 0.0f);
    
-    // Link 1: p0 -> p1
+    // p0 -> p1
     //DrawCylinderBetween(0.0, baseHeight, 0.0, 0.0, 1.10, 0.0, 0.07, 0.20f, 0.55f, 0.90f);
-    DrawCylinderY(0.07,f64NeckLength,0.20f, 0.55f, 0.90f);
+    DrawCylinderY(0.07,f64NeckLength, F32RGB(SOFTBLUE));
     glTranslatef(0.0f,(float)(f64NeckLength), 0.0f);
 
   
-    DrawSphere(0.0f, 0.0f, 0.0f, 0.12, 0.85f, 0.85f, 0.85f);
+    DrawSphere(0.0f, 0.0f, 0.0f, 0.12, F32RGB(LIGHT_GRAY));
     glRotatef((float)(f64ArmRollAngle), 0.0f, 0.0f, 1.0f);
-   
-    DrawCylinderY( 0.07,f64LowerArmLength,0.20f, 0.55f, 0.90f);
+
+    // p1-> p2
+    DrawCylinderY( 0.07,f64LowerArmLength, F32RGB(SOFTBLUE));
     glTranslatef(0.0f,(float)(f64LowerArmLength), 0.0f);
 
-    DrawSphere(0.0f, 0.0f, 0.0f, 0.12, 0.85f, 0.85f, 0.85f);
+    DrawSphere(0.0f, 0.0f, 0.0f, 0.12, F32RGB(LIGHT_GRAY));
     glRotatef((float)(f64HeadRollAngle),0.0f, 0.0f, 1.0f);
-    DrawFrustumY(0.18,0.48,f64LampHeadLength,0.95f, 0.80f, 0.25f);
+
+    // p2-> p3
+    DrawFrustumY(0.18,0.48,f64LampHeadLength, F32RGB(GOLDENYELLOW));
 
     glPopMatrix();
 }

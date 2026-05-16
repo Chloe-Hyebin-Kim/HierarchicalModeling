@@ -3,7 +3,22 @@
 #include <algorithm>
 #include <GL/freeglut.h>
 
+#define MOTION_CNT 5
+#define LIGHT_GRAY 0.85f, 0.85f, 0.85f
+#define DARK_GRAY 0.30f, 0.30f, 0.30f
+#define SOFTBLUE 0.20f, 0.55f, 0.90f
+#define GOLDENYELLOW 0.95f, 0.80f, 0.25f
+
+
 using namespace std;
+
+struct F32RGB
+{
+    float r, g, b;
+	F32RGB() : r(0.0f), g(0.0f), b(0.0f) {}
+    F32RGB(float r, float g, float b) : r(r), g(g), b(b) {}
+
+};
 
 class HierarchicalModeling
 {
@@ -24,15 +39,15 @@ private:
 
     void AlignYAxisToVector(double dx, double dy, double dz) const;
     
-    void DrawBoxY(double width,double height,double depth, float r, float g,float b) const;
-    void DrawCylinderY(double radius,double height,float r,float g,float b,int segments = 40) const;
-    void DrawFrustumY(double radiusBottom, double radiusTop, double height, float r, float g, float b, int segments = 40) const;
-    void DrawSphere(double cx, double cy, double cz, double radius, float r, float g, float b, int slices = 24, int stacks = 12) const;
+    void DrawBoxY(double width,double height,double depth, F32RGB rgb) const;
+    void DrawCylinderY(double radius,double height,F32RGB rgb, int segments = 40) const;
+    void DrawFrustumY(double radiusBottom, double radiusTop, double height, F32RGB rgb, int segments = 40) const;
+    void DrawSphere(double cx, double cy, double cz, double radius, F32RGB rgb, int slices = 24, int stacks = 12) const;
 
     void DrawFloorGrid() const;
 
     void DrawStandLamp() const;
 
-    void DrawCylinderBetween(double sx, double sy, double sz,double ex, double ey, double ez,double radius,float r, float g, float b,int segments = 40) const;
-    void DrawFrustumBetween(double sx, double sy, double sz,double ex, double ey, double ez,double radiusStart,double radiusEnd,float r, float g, float b,int segments = 40) const;
+    void DrawCylinderBetween(double sx, double sy, double sz,double ex, double ey, double ez,double radius,F32RGB rgb,int segments = 40) const;
+    void DrawFrustumBetween(double sx, double sy, double sz,double ex, double ey, double ez,double radiusStart,double radiusEnd,F32RGB rgb,int segments = 40) const;
 };
